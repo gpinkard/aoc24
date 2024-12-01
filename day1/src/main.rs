@@ -67,11 +67,7 @@ fn solution_two(left_list: &Vec<i32>, right_list: &Vec<i32>) {
 
     let mut total: i32 = 0;
     for elem in left_list.iter() {
-        let result = match similarity_map.get(elem) {
-            Some(n) => n,
-            None => &0,
-        };
-        total += elem * result;
+        total += elem * similarity_map.get(elem).unwrap();
     }
 
     println!("similarity score: {total}");
