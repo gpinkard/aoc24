@@ -33,7 +33,7 @@ fn parse_input() -> Result<(Vec<i32>, Vec<i32>), Box<dyn Error>> {
     left_list.sort();
     right_list.sort();
 
-    return Ok((left_list, right_list));
+    Ok((left_list, right_list))
 }
 
 fn solution_one(left_list: &Vec<i32>, right_list: &Vec<i32>) {
