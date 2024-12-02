@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::error::Error;
 use std::{fs, process};
@@ -52,18 +53,17 @@ fn solution_two(left_list: &[i32], right_list: &[i32]) {
 
     for left_elem in left_list.iter() {
         if similarity_map.contains_key(left_elem) {
-            // we have already counted the occurances of this element previously
-            break;
+            // continue if we have already computed this element
+            continue;
         }
 
         let mut occurrences: i32 = 0;
         for right_elem in right_list.iter() {
-            if left_elem == right_elem {
-                occurrences += 1;
-            } else if left_elem < right_elem {
-                // since inputs are sorted, if this condition is true we can
-                // break out of this iteration
-                break;
+            match left_elem.cmp(right_elem) {
+                Ordering::Equal => occurrences += 1,
+                // since inputs are sorted we can break from this iteration if true
+                Ordering::Less => break,
+                Ordering::Greater => (),
             }
         }
         similarity_map.insert(*left_elem, occurrences);
