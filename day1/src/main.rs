@@ -36,7 +36,7 @@ fn parse_input() -> Result<(Vec<i32>, Vec<i32>), Box<dyn Error>> {
     Ok((left_list, right_list))
 }
 
-fn solution_one(left_list: &Vec<i32>, right_list: &Vec<i32>) {
+fn solution_one(left_list: &[i32], right_list: &[i32]) {
     let mut total: i32 = 0;
 
     for i in 0..left_list.len() {
@@ -46,7 +46,7 @@ fn solution_one(left_list: &Vec<i32>, right_list: &Vec<i32>) {
     println!("total distance: {total}");
 }
 
-fn solution_two(left_list: &Vec<i32>, right_list: &Vec<i32>) {
+fn solution_two(left_list: &[i32], right_list: &[i32]) {
     // map elements that appear in both lists to number of occurances in right_list
     let mut similarity_map: HashMap<i32, i32> = HashMap::new();
 
@@ -62,7 +62,7 @@ fn solution_two(left_list: &Vec<i32>, right_list: &Vec<i32>) {
                 occurrences += 1;
             }
         }
-        similarity_map.insert(left_elem.clone(), occurrences);
+        similarity_map.insert(*left_elem, occurrences);
     }
 
     let mut total: i32 = 0;
