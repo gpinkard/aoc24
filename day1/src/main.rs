@@ -60,6 +60,10 @@ fn solution_two(left_list: &[i32], right_list: &[i32]) {
         for right_elem in right_list.iter() {
             if left_elem == right_elem {
                 occurrences += 1;
+            } else if left_elem < right_elem {
+                // since inputs are sorted, if this condition is true we can
+                // break out of this iteration
+                break;
             }
         }
         similarity_map.insert(*left_elem, occurrences);
