@@ -3,6 +3,13 @@ use std::{fs, process};
 
 const INPUT_FILE: &str = "input.txt";
 
+#[derive(Debug, PartialEq, Eq)]
+enum ReportLevelDirection {
+    Increasing,
+    Decreasing,
+    Unknown,
+}
+
 fn main() {
     match parse_input() {
         Ok(reports) => {
@@ -17,20 +24,34 @@ fn main() {
 }
 
 fn process_single_report(report: &[i32]) -> bool {
-    let mut is_increasing: i8 = 0; // 0: not set, 1: increasing, -1: decreasing
+    let mut level_direction = ReportLevelDirection::Unknown;
 
     for i in 1..report.len() {
         let (cur, prev) = (report[i], report[i - 1]);
 
-        // determine if we are increasing or decreasing if this is first iteration
-        if is_increasing == 0 {
-            is_increasing = if cur > prev { 1 } else { -1 };
-        }
+        // true if the diff between the two points is too large or 0
+        let bad_delta = match (cur - prev).abs() {
+            0 => true,
+            1..=3 => false,
+            _ => true,
+        };
 
-        let delta = (cur - prev).abs();
-        let bad_delta = delta == 0 || delta > 3;
-        let switched_directions =
-            (is_increasing == 1 && cur < prev) || (is_increasing == -1 && cur > prev);
+        // determine whether levels are going up or down if this is first iteration
+        level_direction = match level_direction {
+            ReportLevelDirection::Unknown => {
+                if cur > prev {
+                    ReportLevelDirection::Increasing
+                } else {
+                    ReportLevelDirection::Decreasing
+                }
+            }
+            _direction => _direction,
+        };
+
+        // true if we switched directions (ex: went from increasing to decreasing levels)
+        let switched_directions = (level_direction == ReportLevelDirection::Increasing
+            && cur < prev)
+            || (level_direction == ReportLevelDirection::Decreasing && cur > prev);
 
         // if our diff is too big/small or we switched from increasing/decreasing
         if bad_delta || switched_directions {
@@ -44,8 +65,11 @@ fn process_single_report(report: &[i32]) -> bool {
 fn solution_one(reports: &[Vec<i32>]) {
     let mut total = 0;
     for report in reports.iter() {
-        let is_safe = process_single_report(report);
-        total = if is_safe { total + 1 } else { total };
+        total = if process_single_report(report) {
+            total + 1
+        } else {
+            total
+        };
     }
 
     println!("solution one: {total}");
@@ -60,8 +84,7 @@ fn solution_two(reports: &[Vec<i32>]) {
             // until we find one that works or exhaust every element
             let mut tmp = report.clone();
             tmp.remove(i);
-            let is_safe = process_single_report(&tmp);
-            if is_safe {
+            if process_single_report(&tmp) {
                 total += 1;
                 break;
             }
