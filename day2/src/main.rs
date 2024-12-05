@@ -2,11 +2,11 @@ use std::error::Error;
 use std::{fs, process};
 
 const INPUT_FILE: &str = "input.txt";
-
 fn main() {
     match parse_input() {
         Ok(reports) => {
-            solution_one(reports);
+            solution_one(&reports);
+            solution_two(&reports);
         }
         Err(e) => {
             eprintln!("unable to parse input, error: {e}");
@@ -15,34 +15,58 @@ fn main() {
     }
 }
 
-fn solution_one(reports: Vec<Vec<i32>>) {
-    let mut safe_count = 0;
+fn process_single_report(report: &[i32]) -> bool {
+    let mut is_increasing: u8 = 0; // 0 - not set, 1 - increasing, 2 - decreasing
 
-    'outer: for report in reports.iter() {
-        let mut is_increasing: u8 = 0; // 0 - not set, 1 - increasing, 2 - decreasing
+    for i in 1..report.len() {
+        let (cur, prev) = (report[i], report[i - 1]);
 
-        for i in 1..report.len() {
-            let (cur, prev) = (report[i], report[i - 1]);
-
-            // determine if we are increasing or decreasing if this is first iteration
-            if is_increasing == 0 {
-                is_increasing = if cur > prev { 1 } else { 2 };
-            }
-
-            let diff = (cur - prev).abs();
-
-            // if our diff is too big/small or we switched from increasing/decreasing
-            if !((diff > 0 && diff <= 3)
-                && ((is_increasing == 1 && cur > prev) || is_increasing == 2 && cur < prev))
-            {
-                continue 'outer;
-            }
+        // determine if we are increasing or decreasing if this is first iteration
+        if is_increasing == 0 {
+            is_increasing = if cur > prev { 1 } else { 2 };
         }
 
-        safe_count += 1;
+        let diff = (cur - prev).abs();
+        let switched_directions =
+            (is_increasing == 1 && cur > prev) || (is_increasing == 2 && cur < prev);
+
+        // if our diff is too big/small or we switched from increasing/decreasing
+        if !((diff > 0 && diff <= 3) && switched_directions) {
+            return false;
+        }
     }
 
-    println!("safe reports: {safe_count}");
+    true
+}
+
+fn solution_one(reports: &[Vec<i32>]) {
+    let mut total = 0;
+    for report in reports.iter() {
+        let is_safe = process_single_report(report);
+        total = if is_safe { total + 1 } else { total };
+    }
+
+    println!("solution one: {total}");
+}
+
+fn solution_two(reports: &[Vec<i32>]) {
+    let mut total = 0;
+
+    for report in reports.iter() {
+        for i in 0..report.len() {
+            // brute force by removing each element from the report
+            // until we find one that works or exhaust every element
+            let mut tmp = report.clone();
+            tmp.remove(i);
+            let is_safe = process_single_report(&tmp);
+            if is_safe {
+                total += 1;
+                break;
+            }
+        }
+    }
+
+    println!("solution two: {total}");
 }
 
 fn parse_input() -> Result<Vec<Vec<i32>>, Box<dyn Error>> {
