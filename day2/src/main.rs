@@ -2,6 +2,7 @@ use std::error::Error;
 use std::{fs, process};
 
 const INPUT_FILE: &str = "input.txt";
+
 fn main() {
     match parse_input() {
         Ok(reports) => {
