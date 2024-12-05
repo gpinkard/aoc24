@@ -28,11 +28,12 @@ fn process_single_report(report: &[i32]) -> bool {
         }
 
         let diff = (cur - prev).abs();
+        let diff_too_large = !(diff > 0 && diff <= 3);
         let switched_directions =
-            (is_increasing == 1 && cur > prev) || (is_increasing == 2 && cur < prev);
+            (is_increasing == 1 && cur < prev) || (is_increasing == 2 && cur > prev);
 
         // if our diff is too big/small or we switched from increasing/decreasing
-        if !((diff > 0 && diff <= 3) && switched_directions) {
+        if diff_too_large || switched_directions {
             return false;
         }
     }
