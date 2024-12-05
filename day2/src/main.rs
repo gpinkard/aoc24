@@ -17,23 +17,23 @@ fn main() {
 }
 
 fn process_single_report(report: &[i32]) -> bool {
-    let mut is_increasing: u8 = 0; // 0 - not set, 1 - increasing, 2 - decreasing
+    let mut is_increasing: i8 = 0; // 0: not set, 1: increasing, -1: decreasing
 
     for i in 1..report.len() {
         let (cur, prev) = (report[i], report[i - 1]);
 
         // determine if we are increasing or decreasing if this is first iteration
         if is_increasing == 0 {
-            is_increasing = if cur > prev { 1 } else { 2 };
+            is_increasing = if cur > prev { 1 } else { -1 };
         }
 
-        let diff = (cur - prev).abs();
-        let diff_too_large = !(diff > 0 && diff <= 3);
+        let delta = (cur - prev).abs();
+        let bad_delta = delta == 0 || delta > 3;
         let switched_directions =
-            (is_increasing == 1 && cur < prev) || (is_increasing == 2 && cur > prev);
+            (is_increasing == 1 && cur < prev) || (is_increasing == -1 && cur > prev);
 
         // if our diff is too big/small or we switched from increasing/decreasing
-        if diff_too_large || switched_directions {
+        if bad_delta || switched_directions {
             return false;
         }
     }
